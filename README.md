@@ -1,4 +1,4 @@
-# 🕒 NetTime Ecosystem - Feeder Client (V1.1.0-alpha) 🐟
+# 🕒 NetTime Ecosystem - Feeder Client (V1.0.0-alpha) 🐟
 
 ![C++](https://img.shields.io/badge/C++-00599C?style=flat-square&logo=c%2B%2B&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-ffca28?style=flat-square&logo=firebase&logoColor=black)
