@@ -1,0 +1,12 @@
+// secrets.h - Wireless Credentials Template
+#ifndef SECRETS_H
+#define SECRETS_H
+
+
+#define YOUR_SSID "PASTE_YOUR_SSID_HERE"
+#define YOUR_PASS "PASTE_YOUR_PASSWORD_HERE"
+#define YOUR_OTA_PASS "PASTE_YOUR_OTA_PASS_HERE"
+//#define YOUR_URL "YOUR_URL"
+//#define YOUR_DATABASE_SECRET_KEY "YOUR_DATABASE_SECRET_KEY"
+
+#endif

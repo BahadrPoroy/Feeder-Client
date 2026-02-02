@@ -1,0 +1,13 @@
+# Sensitive data
+secrets.h
+
+# Arduino IDE / Compilation leftovers
+build/
+libraries/
+*.hex
+*.elf
+*.bin
+
+# OS generated files
+.DS_Store
+Thumbs.db
