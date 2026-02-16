@@ -51,17 +51,13 @@ public:
     udp.begin(INCOMING_PORT);
   }
 
-  void updateFirebase(const String &Status, long lastFedTime) {
-    Firebase.setString(firebaseData, "/NetTime/isFed", Status);
-    Firebase.setInt(firebaseData, "/NetTime/lastFedTime", lastFedTime);
+  void updateFirebase(const String &Status) {
+    Firebase.setString(firebaseData, "/FeederStatus/Status", Status);
   }
 
-  void readFirebase(bool &isFed, long &lastFedTime) {
-    if (Firebase.getBool(firebaseData, "/NetTime/isFed")) {
-      isFed = firebaseData.boolData();
-    }
-    if (Firebase.getInt(firebaseData, "/NetTime/lastFedTime")) {
-      lastFedTime = firebaseData.intData();
+  void readFirebase(String &isFed, long &lastFedTime) {
+    if (Firebase.getBool(firebaseData, "/FeederStatus/Status")) {
+      isFed = firebaseData.stringData();
     }
   }
 

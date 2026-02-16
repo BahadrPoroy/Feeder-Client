@@ -74,7 +74,7 @@ void dispensePortion() {
   }
 
   netBox.broadcastUDP(Status);
-  netBox.updateFirebase(Status, lastPacketTime);
+  netBox.updateFirebase(Status);
   Serial1.print("Dispense finished with status: ");
   Serial1.println(Status);
 }
