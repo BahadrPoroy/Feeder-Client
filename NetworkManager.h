@@ -90,7 +90,7 @@ public:
         unsigned long currentTime = millis();
         if (Status == "ERROR_HARDWARE") {
           Serial1.println("BLOCK: Hardware error persistent. Manual reset required.");
-          broadcastUDP("HARDWARE_ERROR_REPORT");
+          broadcastUDP(Status);
           return;
         } else if (Status == "PENDING" || Status == "SUCCESS" || (currentTime - lastPacketTime < 2000)) {
           Serial1.print("Protection Triggered: Skipping duplicate/invalid request. Status: ");
