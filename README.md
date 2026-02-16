@@ -1,4 +1,4 @@
-# 🕒 NetTime Ecosystem - Feeder Client (V1.0.0-alpha) 🐟
+# 🕒 NetTime Ecosystem - Feeder Client (V1.1.1) 🐟
 
 ![C++](https://img.shields.io/badge/C++-00599C?style=flat-square&logo=c%2B%2B&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-ffca28?style=flat-square&logo=firebase&logoColor=black)
@@ -51,8 +51,7 @@ To ensure a professional and durable finish, the enclosures for all ecosystem no
 ## 📂 Project Structure
 
 ```
-text
-├── structs.h         # Centralized Data Structures (WeatherData, etc.)
+Feeder_Client
 ├── NetworkManager.h  # Firebase, WiFi, UDP & OTA Updates
 ```
 
