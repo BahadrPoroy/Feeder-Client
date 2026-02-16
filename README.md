@@ -38,15 +38,23 @@ The Feeder Client follows the **Publisher-Subscriber** model:
 
 ---
 
-### 📂 Project Structure
+### 🎨 Industrial Design & Prototyping
 
-The codebase is organized into modular headers to separate hardware abstraction from network logic:
+To ensure a professional and durable finish, the enclosures for all ecosystem nodes (Server, Feeder, and Display) were **custom-designed and 3D printed**.
 
-* **`FeederClient.ino`**: Main loop and system initialization.
-* **`FirebaseHandler.h`**: Manages real-time data streaming, state listeners, and database updates.
-* **`MotorController.h`**: Encapsulates the physical movement logic, PWM signals, and calibration.
-* **`NetworkManager.h`**: Handles robust WiFi connectivity, NTP time fetching, and OTA updates.
-* **`config.h`**: Centralized HAL (Hardware Abstraction Layer), pin assignments, and Firebase constants.
+* **Custom Enclosures:** Specifically tailored to house the ESP8266, sensors, and actuators while maintaining optimal airflow and structural integrity.
+* **Rapid Prototyping:** Iterative design process to ensure perfect fitment for the MG90S servo and OLED mounts.
+* **Integration:** The hardware is not just a circuit on a breadboard; it is a fully enclosed, desk-ready consumer electronics prototype.
+
+---
+
+## 📂 Project Structure
+
+```
+text
+├── structs.h         # Centralized Data Structures (WeatherData, etc.)
+├── NetworkManager.h  # Firebase, WiFi, UDP & OTA Updates
+```
 
 ---
 
