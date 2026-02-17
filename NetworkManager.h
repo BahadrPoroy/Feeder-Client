@@ -43,7 +43,6 @@ public:
     Firebase.begin(&config, &auth);
     Firebase.reconnectWiFi(true);
 
-    // OTA Callbacks linked to DisplayManager
     ArduinoOTA.setHostname("Feeder_Client");
     ArduinoOTA.setPassword(YOUR_OTA_PASS);
 
@@ -55,9 +54,9 @@ public:
     Firebase.setString(firebaseData, "/FeederStatus/Status", Status);
   }
 
-  void readFirebase(String &isFed, long &lastFedTime) {
-    if (Firebase.getBool(firebaseData, "/FeederStatus/Status")) {
-      isFed = firebaseData.stringData();
+  void readFirebase(bool &isFed) {
+    if (Firebase.getBool(firebaseData, "/NetTime/isFed")) {
+      isFed = firebaseData.boolData();
     }
   }
 
@@ -73,7 +72,7 @@ public:
     ArduinoOTA.handle();
   }
 
-  void handleNetwork(String &Status, unsigned long &lastPacketTime) {
+  void handleNetwork(const bool &isFed, String &Status, unsigned long &lastPacketTime) {
     int packetSize = udp.parsePacket();
     if (packetSize) {
       char buf[255];
@@ -88,10 +87,11 @@ public:
       // Feeding Control
       if (req == "FEED_NOW") {
         unsigned long currentTime = millis();
-        if (Status == "ERROR_HARDWARE") {
+        if (isFed) {
+          broadcastUDP(Status);
+        } else if (Status == "ERROR_HARDWARE") {
           Serial1.println("BLOCK: Hardware error persistent. Manual reset required.");
-          broadcastUDP("HARDWARE_ERROR_REPORT");
-          return;
+          broadcastUDP(Status);
         } else if (Status == "PENDING" || Status == "SUCCESS" || (currentTime - lastPacketTime < 2000)) {
           Serial1.print("Protection Triggered: Skipping duplicate/invalid request. Status: ");
           Serial1.println(Status);
