@@ -88,6 +88,7 @@ public:
       if (req == "FEED_NOW") {
         unsigned long currentTime = millis();
         if (isFed) {
+          Status = "SUCCESS";
           broadcastUDP(Status);
         } else if (Status == "ERROR_HARDWARE") {
           Serial1.println("BLOCK: Hardware error persistent. Manual reset required.");
