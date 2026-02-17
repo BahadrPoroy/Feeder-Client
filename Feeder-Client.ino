@@ -15,6 +15,8 @@ NetworkManager netBox;
 
 // --- System Settings ---
 String Status = "IDLE";
+bool isFed = false;
+long int lastFirebaseSync = 0;
 unsigned long lastPacketTime = 0;
 
 // --- Servo Settings ---
@@ -42,6 +44,7 @@ void setup() {
   }
   feederServo.write(STOP_VAL);  // Servo Initial State
   Status = "IDLE";
+  netBox.readFirebase(isFed);
   netBox.broadcastUDP(Status);
 }
 
@@ -54,7 +57,7 @@ void dispensePortion() {
 
   unsigned long timeout = millis();
   int slowFact = 0;
-  
+
   while (digitalRead(SWITCH_PIN) == LOW) {
     if (millis() - timeout > 50000) {  // 50 second safety timeout
       Serial1.println("ERROR: Switch not triggered!");
@@ -81,11 +84,15 @@ void dispensePortion() {
 
 void loop() {
   netBox.handleOTA();
-  netBox.handleNetwork(Status, lastPacketTime);
+  netBox.handleNetwork(isFed, Status, lastPacketTime);
 
   if (Status == "SUCCESS" && (millis() - lastPacketTime > 600000)) {
     Status = "IDLE";
     netBox.broadcastUDP("SYSTEM_READY_IDLE");
     Serial1.println("Cooldown finished. System is IDLE again.");
+  }
+  if (millis() - lastFirebaseSync >= 20000) {
+    lastFirebaseSync = millis();
+    netBox.readFirebase(isFed);
   }
 }
