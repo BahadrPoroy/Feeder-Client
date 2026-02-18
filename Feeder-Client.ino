@@ -18,6 +18,8 @@ String Status = "IDLE";
 bool isFed = false;
 long int lastFirebaseSync = 0;
 unsigned long lastPacketTime = 0;
+int lastCheckDay = -1;
+int lastCheckInterval = 0;
 
 // --- Servo Settings ---
 const int STOP_VAL = 90;
@@ -26,8 +28,10 @@ const int REVERSE_VAL = 60;
 const int SPEED_LIMIT = 115;
 
 // --- Time Settings ---
+struct tm timeinfo;
 const char* ntpServer = "pool.ntp.org";
 const long gmtOffset_sec = 3 * 3600;
+
 
 void setup() {
 
@@ -85,14 +89,25 @@ void dispensePortion() {
 void loop() {
   netBox.handleOTA();
   netBox.handleNetwork(isFed, Status, lastPacketTime);
-
+  if (millis() - lastCheckInterval >= 1000) {
+    lastCheckInterval = millis();
+    time_t now = time(nullptr);
+    localtime_r(&now, &timeinfo);
+  }
   if (Status == "SUCCESS" && (millis() - lastPacketTime > 600000)) {
     Status = "IDLE";
-    netBox.broadcastUDP("SYSTEM_READY_IDLE");
+    netBox.broadcastUDP(Status);
     Serial1.println("Cooldown finished. System is IDLE again.");
   }
   if (millis() - lastFirebaseSync >= 20000) {
     lastFirebaseSync = millis();
     netBox.readFirebase(isFed);
+  }
+  if (timeinfo.tm_hour == 0 && timeinfo.tm_min == 0 && lastCheckDay != timeinfo.tm_wday) {
+    lastCheckDay = timeinfo.tm_wday;
+    Status = "IDLE";
+    isFed = false;
+    netBox.broadcastUDP(Status);
+    netBox.updateFirebase(Status);
   }
 }
