@@ -11,6 +11,7 @@
 #include "secrets.h"
 
 extern void dispensePortion();
+extern void Restart();
 
 class NetworkManager {
 private:
@@ -102,6 +103,9 @@ public:
           lastPacketTime = currentTime;
           dispensePortion();
         }
+      }
+      if(req == "RESTART"){
+        Restart();
       }
     }
   }

@@ -23,9 +23,9 @@ int lastCheckInterval = 0;
 
 // --- Servo Settings ---
 const int STOP_VAL = 90;
-const int START_VAL = 120;
-const int REVERSE_VAL = 60;
-const int SPEED_LIMIT = 115;
+const int START_VAL = 125;
+const int REVERSE_VAL = 70;
+const int SPEED_LIMIT = 110;
 
 // --- Time Settings ---
 struct tm timeinfo;
@@ -42,30 +42,40 @@ void setup() {
 
   pinMode(SWITCH_PIN, INPUT_PULLUP);
   feederServo.attach(SERVO_PIN);
-  while (digitalRead(SWITCH_PIN) == LOW) {
-    feederServo.write(REVERSE_VAL);
-    yield();
-  }
-  feederServo.write(STOP_VAL);  // Servo Initial State
-  Status = "IDLE";
-  netBox.readFirebase(isFed);
-  netBox.broadcastUDP(Status);
+  
+  Restart(); //Gets the servo to home position
+  
 }
 
 void dispensePortion() {
   Status = "PENDING";
   netBox.broadcastUDP(Status);
-  feederServo.write(START_VAL);
+  bool switchState = digitalRead(SWITCH_PIN);
 
-  delay(2000);  // Wait to clear the switch area
+  // --- Clearing The Switch Area ---
 
   unsigned long timeout = millis();
+
+  while (millis() - timeout <= 2000) {
+    feederServo.write(START_VAL);
+  }
+  // --- ~ ~ ~ ---
+
+  if (digitalRead(SWITCH_PIN) == switchState) {  //Controls the system for any stucks
+    feederServo.write(STOP_VAL);
+    Status = "ERROR_HARDWARE(Servo/Switch_Error)";
+    netBox.broadcastUDP(Status);
+    netBox.updateFirebase(Status);
+    return;
+  }
+
+  timeout = millis();
   int slowFact = 0;
 
   while (digitalRead(SWITCH_PIN) == LOW) {
-    if (millis() - timeout > 50000) {  // 50 second safety timeout
+    if (millis() - timeout > 10000) {  // 10 second safety timeout
       Serial1.println("ERROR: Switch not triggered!");
-      Status = "ERROR_HARDWARE";
+      Status = "ERROR_HARDWARE(Possible_Servo_Stuck)";
       break;
     }
     feederServo.write(START_VAL - slowFact);
@@ -110,4 +120,16 @@ void loop() {
     netBox.broadcastUDP(Status);
     netBox.updateFirebase(Status);
   }
+}
+
+void Restart() {
+  while (digitalRead(SWITCH_PIN) == LOW) {
+    feederServo.write(REVERSE_VAL);
+    yield();
+  }
+  feederServo.write(STOP_VAL);  // Servo Initial State
+  Status = "IDLE";
+  netBox.readFirebase(isFed);
+  netBox.broadcastUDP(Status);
+  netBox.updateFirebase(Status);
 }
