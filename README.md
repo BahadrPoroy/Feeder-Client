@@ -15,6 +15,7 @@ A **cloud-connected smart actuator node** based on **ESP8266**. This device is a
     - ***In `dispensePortion` function, `millis()` based control used instead of `delay(2000)` for `non-blocking` principle. Added a fault control section to detect switch state changes..***
     - **Error detection messages has been improved from now on, they include more information *If the `switch released` control (the first one) detects an error, message includes `servo/switch error` notification else, if `is switch re-triggered` control detects an error the message includes `possible_servo_stuck` information***
 - **`is switch re-triggered` control's timeout value is changed, now it's reduced to ten seconds for more reliable and realistic results**
+- **Added a Restart function to automatically calibrate and return the servo to its home position upon system initialization or recovery.**
 
 ### 🚀 Key Features
 
