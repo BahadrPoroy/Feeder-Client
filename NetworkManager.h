@@ -61,6 +61,12 @@ public:
     }
   }
 
+  void readFirebase(int &dailyFeedLimit) {
+    if (Firebase.getInt(firebaseData, "/NetTime/FeedLimit")) {
+      dailyFeedLimit = firebaseData.intData();
+    }
+  }
+
   void broadcastUDP(String message) {
     IPAddress broadcastIP = WiFi.localIP();
     broadcastIP[3] = 255;
@@ -91,7 +97,7 @@ public:
         if (isFed) {
           Status = "SUCCESS";
           broadcastUDP(Status);
-        } else if (Status == "ERROR_HARDWARE") {
+        } else if (Status.startsWith("ERROR")) {
           Serial1.println("BLOCK: Hardware error persistent. Manual reset required.");
           broadcastUDP(Status);
         } else if (Status == "PENDING" || Status == "SUCCESS" || (currentTime - lastPacketTime < 2000)) {
@@ -104,7 +110,7 @@ public:
           dispensePortion();
         }
       }
-      if(req == "RESTART"){
+      if (req == "RESTART") {
         Restart();
       }
     }

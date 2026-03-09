@@ -20,6 +20,8 @@ long int lastFirebaseSync = 0;
 unsigned long lastPacketTime = 0;
 int lastCheckDay = -1;
 int lastCheckInterval = 0;
+int dailyFeedCount = 0;
+int dailyFeedLimit = 1;
 
 // --- Servo Settings ---
 const int STOP_VAL = 90;
@@ -37,17 +39,23 @@ void setup() {
 
   netBox.begin();
   Serial1.begin(115200);
+  Serial.begin(115200);
 
   configTime(gmtOffset_sec, 0, ntpServer);
 
   pinMode(SWITCH_PIN, INPUT_PULLUP);
   feederServo.attach(SERVO_PIN);
-  
-  Restart(); //Gets the servo to home position
-  
+
+  Restart();  //Gets the servo to home position
+
+  netBox.readFirebase(dailyFeedLimit);
 }
 
 void dispensePortion() {
+  if(dailyFeedCount == dailyFeedLimit){
+    netBox.broadcastUDP("ALREADY FED");
+    return;
+  }
   Status = "PENDING";
   netBox.broadcastUDP(Status);
   bool switchState = digitalRead(SWITCH_PIN);
@@ -88,6 +96,7 @@ void dispensePortion() {
 
   if (Status == "PENDING") {
     Status = "SUCCESS";
+    dailyFeedCount++;
   }
 
   netBox.broadcastUDP(Status);
@@ -117,6 +126,7 @@ void loop() {
     lastCheckDay = timeinfo.tm_wday;
     Status = "IDLE";
     isFed = false;
+    dailyFeedCount = 0;
     netBox.broadcastUDP(Status);
     netBox.updateFirebase(Status);
   }
