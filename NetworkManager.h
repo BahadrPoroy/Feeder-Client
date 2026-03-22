@@ -12,6 +12,9 @@
 
 extern void dispensePortion();
 extern void Restart();
+extern const int L_RED;
+extern const int L_BLUE;
+extern const int L_GREEN;
 
 class NetworkManager {
 private:
@@ -30,14 +33,23 @@ private:
 public:
 
   void begin() {
+    digitalWrite(L_RED, HIGH);
+    digitalWrite(L_GREEN, HIGH);
+    digitalWrite(L_BLUE, HIGH);
+    int now = millis();
     WiFi.mode(WIFI_STA);
     WiFi.begin(YOUR_SSID, YOUR_PASS);
 
     Serial.print("Connecting to WiFi");
     while (WiFi.status() != WL_CONNECTED) {
+      if (millis() - now >= 500) {
+        digitalWrite(L_BLUE, !digitalRead(L_BLUE));
+        now = millis();
+      }
       delay(10);
     }
     Serial.println("\nWiFi Connected");
+    digitalWrite(L_BLUE, LOW);
 
     config.host = YOUR_URL;
     config.signer.tokens.legacy_token = YOUR_DATABASE_SECRET_KEY;
@@ -55,15 +67,35 @@ public:
     Firebase.setString(firebaseData, "/FeederStatus/Status", Status);
   }
 
-  void readFirebase(bool &isFed) {
-    if (Firebase.getBool(firebaseData, "/NetTime/isFed")) {
-      isFed = firebaseData.boolData();
+  void updateFirebase(const int &feedCount) {
+    Firebase.setInt(firebaseData, "/FeederStatus/FeedCount", feedCount);
+  }
+
+  void readFeedCount(int &feedCount, int i = 0) {
+    if (Firebase.getInt(firebaseData, "/FeederStatus/FeedCount")) {
+      feedCount = firebaseData.intData();
+      Serial1.println("FeedCount Alındı");
+      return;
+    } else if (i == 5) {
+      return;
+    } else {
+      i++;
+      readFeedCount(feedCount, i);
+      Serial1.println("FeedCount Alınmadı");
     }
   }
 
-  void readFirebase(int &dailyFeedLimit) {
-    if (Firebase.getInt(firebaseData, "/NetTime/FeedLimit")) {
+  void readFeedLimit(int &dailyFeedLimit, int i = 0) {
+    if (Firebase.getInt(firebaseData, "/FeederStatus/FeedLimit")) {
       dailyFeedLimit = firebaseData.intData();
+      Serial1.println("FeedLimit Alındı");
+      return;
+    } else if (i == 5) {
+      return;
+    } else {
+      i++;
+      readFeedLimit(dailyFeedLimit, i);
+      Serial1.println("FeedLimit Alınmadı");
     }
   }
 
@@ -79,7 +111,7 @@ public:
     ArduinoOTA.handle();
   }
 
-  void handleNetwork(const bool &isFed, String &Status, unsigned long &lastPacketTime) {
+  void handleNetwork(String &Status, unsigned long &lastPacketTime) {
     int packetSize = udp.parsePacket();
     if (packetSize) {
       char buf[255];
@@ -94,10 +126,7 @@ public:
       // Feeding Control
       if (req == "FEED_NOW") {
         unsigned long currentTime = millis();
-        if (isFed) {
-          Status = "SUCCESS";
-          broadcastUDP(Status);
-        } else if (Status.startsWith("ERROR")) {
+        if (Status.startsWith("ERROR")) {
           Serial1.println("BLOCK: Hardware error persistent. Manual reset required.");
           broadcastUDP(Status);
         } else if (Status == "PENDING" || Status == "SUCCESS" || (currentTime - lastPacketTime < 2000)) {
