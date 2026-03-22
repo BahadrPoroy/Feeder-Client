@@ -1,4 +1,4 @@
-# 🕒 NetTime Ecosystem - Feeder Client (V1.1.2) 🐟
+# 🕒 NetTime Ecosystem - Feeder Client (V1.2.0) 🐟
 
 ![C++](https://img.shields.io/badge/C++-00599C?style=flat-square&logo=c%2B%2B&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-ffca28?style=flat-square&logo=firebase&logoColor=black)
@@ -7,15 +7,18 @@
 
 A **cloud-connected smart actuator node** based on **ESP8266**. This device is a critical peripheral in the NetTime ecosystem, responsible for executing automated feeding cycles and maintaining a persistent global state via **Firebase Realtime Database**.
 
-## 🚀 What's New in v1.1.2
-### FIXES ###
+## 🚀 What's New in v1.2.0
+<!--### FIXES ###
 - **`START_VAL`, `SPEED_LIMIT` and `REVERSE_VAL` values are refactored, `START_VAL` is increased to 125 from 120 for faster first movement and easier escaping, `SPEED_LIMIT` is reduced to 110 from 115 for more consistent stopping on switch also, `REVERSE_VAL` is increased to 70 from 60 for same reason as `SPEED_LIMIT`**
+-->
 ### IMPROVEMENTS ###
-- **Detailed and improved fault detection system:**
+<!--- **Detailed and improved fault detection system:**
     - ***In `dispensePortion` function, `millis()` based control used instead of `delay(2000)` for `non-blocking` principle. Added a fault control section to detect switch state changes..***
     - **Error detection messages has been improved from now on, they include more information *If the `switch released` control (the first one) detects an error, message includes `servo/switch error` notification else, if `is switch re-triggered` control detects an error the message includes `possible_servo_stuck` information***
 - **`is switch re-triggered` control's timeout value is changed, now it's reduced to ten seconds for more reliable and realistic results**
 - **Added a Restart function to automatically calibrate and return the servo to its home position upon system initialization or recovery.**
+-->
+   - **Integrated an RGB LED as a real-time status indicator. The system now provides visual feedback: flashing $\color{blue}{\text{blue}}$ during Wi-Fi negotiation, turning solid $\color{blue}{\text{blue}}$ once connected. Other states include $\color{red}{\text{red}}$ for hardware/software errors, $\color{yellow}{\text{yellow}}$ for pending operations, and $\color{green}{\text{green}}$ for successful task completion.**
 
 ### 🚀 Key Features
 
@@ -24,7 +27,7 @@ A **cloud-connected smart actuator node** based on **ESP8266**. This device is a
 * **Decoupled Architecture:** Operates as a standalone agent. While it integrates with the [NetTime-Env-Server](https://github.com/BahadrPoroy/NetTime-Env-Server), it can function independently through direct web-dashboard commands.
 * **Persistent Event Logging:** Automatically stamps and uploads `lastFedTime` and `isFed` status to the cloud, ensuring data persistence even after power cycles.
 * **Network Resilience:** Features an automated reconnection engine for both WiFi and Firebase services to prevent missed feeding cycles.
-
+* **Status LED:** Integrated an RGB indicator to provide real-time visual feedback, significantly enhancing the `User Experience (UX)`.
 ---
 
 ### 🏗️ System Architecture
